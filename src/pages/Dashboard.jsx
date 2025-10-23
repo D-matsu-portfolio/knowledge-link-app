@@ -4,6 +4,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { Container, Row, Col, Card, Spinner, Alert, Button, ListGroup } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { FaUserPlus, FaAddressCard } from 'react-icons/fa';
+import AnimatedPage from '../components/AnimatedPage';
+import { motion } from 'framer-motion';
 
 const WelcomeHeader = ({ profile, user }) => (
   <div className="p-5 mb-4 bg-light rounded-3">
@@ -12,14 +14,18 @@ const WelcomeHeader = ({ profile, user }) => (
       <p className="col-md-8 fs-4">
         学習の旅を始めましょう。新しいパートナーを探したり、プロフィールを充実させて他の人に見つけてもらいやすくしましょう。
       </p>
-      <Link to="/users" className="btn btn-primary btn-lg me-2">
-        <FaUserPlus className="me-2" />
-        パートナーを探す
-      </Link>
-      <Link to="/profile" className="btn btn-secondary btn-lg">
-        <FaAddressCard className="me-2" />
-        プロフィールを編集
-      </Link>
+      <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="d-inline-block me-2">
+        <Link to="/users" className="btn btn-primary btn-lg">
+          <FaUserPlus className="me-2" />
+          パートナーを探す
+        </Link>
+      </motion.div>
+      <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="d-inline-block">
+        <Link to="/profile" className="btn btn-secondary btn-lg">
+          <FaAddressCard className="me-2" />
+          プロフィールを編集
+        </Link>
+      </motion.div>
     </Container>
   </div>
 );
@@ -72,48 +78,50 @@ export default function Dashboard() {
   if (error) return <Container className="mt-5"><Alert variant="danger">{error}</Alert></Container>;
 
   return (
-    <Container>
-      <WelcomeHeader profile={profile} user={user} />
-      
-      <Row>
-        <Col md={12} className="mb-4">
-          <Card>
-            <Card.Header as="h5">あなたへの申請</Card.Header>
-            <Card.Body>
-              {pendingRequests.length > 0 ? (
-                <ListGroup variant="flush">
-                  {pendingRequests.map(req => (
-                    <ListGroup.Item key={req.id} action as={Link} to="/commitments">
-                      <strong>{req.requester.username}</strong> さんからパートナー申請が届いています。
-                    </ListGroup.Item>
-                  ))}
-                </ListGroup>
-              ) : (
-                <p className="text-muted">新しい申請はありません。</p>
-              )}
-            </Card.Body>
-          </Card>
-        </Col>
+    <AnimatedPage>
+      <Container>
+        <WelcomeHeader profile={profile} user={user} />
+        
+        <Row>
+          <Col md={12} className="mb-4">
+            <Card>
+              <Card.Header as="h5">あなたへの申請</Card.Header>
+              <Card.Body>
+                {pendingRequests.length > 0 ? (
+                  <ListGroup variant="flush">
+                    {pendingRequests.map(req => (
+                      <ListGroup.Item key={req.id} action as={Link} to="/commitments">
+                        <strong>{req.requester.username}</strong> さんからパートナー申請が届いています。
+                      </ListGroup.Item>
+                    ))}
+                  </ListGroup>
+                ) : (
+                  <p className="text-muted">新しい申請はありません。</p>
+                )}
+              </Card.Body>
+            </Card>
+          </Col>
 
-        <Col md={12} className="mb-4">
-          <Card>
-            <Card.Header as="h5">契約中のパートナー</Card.Header>
-            <Card.Body>
-              {activePartners.length > 0 ? (
-                <ListGroup variant="flush">
-                  {activePartners.map(partner => (
-                    <ListGroup.Item key={partner.id} action as={Link} to={`/chat/${partner.commitmentId}`}>
-                       <strong>{partner.username}</strong> さんと契約中です。チャットを開始しましょう。
-                    </ListGroup.Item>
-                  ))}
-                </ListGroup>
-              ) : (
-                <p className="text-muted">現在契約中のパートナーはいません。</p>
-              )}
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-    </Container>
+          <Col md={12} className="mb-4">
+            <Card>
+              <Card.Header as="h5">契約中のパートナー</Card.Header>
+              <Card.Body>
+                {activePartners.length > 0 ? (
+                  <ListGroup variant="flush">
+                    {activePartners.map(partner => (
+                      <ListGroup.Item key={partner.id} action as={Link} to={`/chat/${partner.commitmentId}`}>
+                         <strong>{partner.username}</strong> さんと契約中です。チャットを開始しましょう。
+                      </ListGroup.Item>
+                    ))}
+                  </ListGroup>
+                ) : (
+                  <p className="text-muted">現在契約中のパートナーはいません。</p>
+                )}
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+      </Container>
+    </AnimatedPage>
   );
 }

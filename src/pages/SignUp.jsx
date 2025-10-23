@@ -62,49 +62,45 @@ export default function SignUp() {
 
                   {message && <Alert variant="success">{message}</Alert>}
 
-                  <Form onSubmit={handleSubmit}>
+                                  <Form onSubmit={handleSubmit}>
 
-                    <Form.Group id="username" className="mb-3">
+                                    <Form.Floating className="mb-3">
 
-                      <Form.Label>ユーザー名</Form.Label>
+                                      <Form.Control id="username" type="text" placeholder="ユーザー名" value={username} onChange={(e) => setUsername(e.target.value)} required />
 
-                      <Form.Control type="text" value={username} onChange={(e) => setUsername(e.target.value)} required />
+                                      <label htmlFor="username">ユーザー名</label>
 
-                    </Form.Group>
+                                    </Form.Floating>
 
-                    <Form.Group id="email" className="mb-3">
+                                    <Form.Floating className="mb-3">
 
-                      <Form.Label>メールアドレス</Form.Label>
+                                      <Form.Control id="email" type="email" placeholder="メールアドレス" value={email} onChange={(e) => setEmail(e.target.value)} required />
 
-                      <Form.Control type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                                      <label htmlFor="email">メールアドレス</label>
 
-                    </Form.Group>
+                                    </Form.Floating>
 
-                    <Form.Group id="password" className="mb-4">
+                                    <Form.Floating className="mb-4">
 
-                      <Form.Label>パスワード</Form.Label>
+                                      <Form.Control id="password" type={showPassword ? "text" : "password"} placeholder="パスワード" value={password} onChange={(e) => setPassword(e.target.value)} required />
 
-                      <InputGroup>
+                                      <label htmlFor="password">パスワード</label>
 
-                        <Form.Control type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} required />
+                                      <InputGroup.Text onClick={() => setShowPassword(!showPassword)} style={{ cursor: 'pointer', position: 'absolute', right: 0, top: 0, height: '100%', zIndex: 3, background: 'transparent', border: 'none' }}>
 
-                        <InputGroup.Text onClick={() => setShowPassword(!showPassword)} style={{ cursor: 'pointer' }}>
+                                        {showPassword ? <FaEyeSlash /> : <FaEye />}
 
-                          {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                      </InputGroup.Text>
 
-                        </InputGroup.Text>
+                                    </Form.Floating>
 
-                      </InputGroup>
+                                    <Button disabled={loading} className="w-100" type="submit">
 
-                    </Form.Group>
+                                      {loading ? <Spinner as="span" animation="border" size="sm" /> : '登録する'}
 
-                    <Button disabled={loading} className="w-100" type="submit">
+                                    </Button>
 
-                      {loading ? <Spinner as="span" animation="border" size="sm" /> : '登録する'}
-
-                    </Button>
-
-                  </Form>
+                                  </Form>
 
                   <div className="w-100 text-center mt-3">
 

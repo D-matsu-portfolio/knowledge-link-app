@@ -32,11 +32,11 @@ export default function NavBar() {
   return (
     <Navbar bg="primary" variant="dark" expand="lg" className="shadow-sm">
       <Container>
-        <Navbar.Brand as={Link} to="/">KnowledgeLink</Navbar.Brand>
+        <Navbar.Brand as={Link} to="/dashboard">KnowledgeLink</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
-            <Nav.Link as={Link} to="/">ダッシュボード</Nav.Link>
+            <Nav.Link as={Link} to="/dashboard">ダッシュボード</Nav.Link>
             <Nav.Link as={Link} to="/users">パートナーを探す</Nav.Link>
             <Nav.Link as={Link} to="/commitments">契約管理</Nav.Link>
             <Nav.Link as={Link} to="/profile">プロフィール</Nav.Link>

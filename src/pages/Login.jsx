@@ -26,7 +26,7 @@ export default function Login() {
       const { data: { session }, error: sessionError } = await supabase.auth.setSession(data.session);
       if (sessionError) throw new Error(sessionError.message);
       if (!session) throw new Error('ログインに失敗しました。ユーザー名またはパスワードを確認してください。');
-      navigate('/');
+      navigate('/dashboard');
     } catch (err) {
       setError(err.message || 'ログイン中に不明なエラーが発生しました。');
     } finally {
@@ -47,19 +47,19 @@ export default function Login() {
                 <h2 className="text-center mb-4">ログイン</h2>
                 {error && <Alert variant="danger">{error}</Alert>}
                 <Form onSubmit={handleSubmit}>
-                  <Form.Group id="username" className="mb-3">
-                    <Form.Label>ユーザー名</Form.Label>
-                    <Form.Control type="text" value={username} onChange={(e) => setUsername(e.target.value)} required />
-                  </Form.Group>
-                  <Form.Group id="password" className="mb-4">
-                    <Form.Label>パスワード</Form.Label>
-                    <InputGroup>
-                      <Form.Control type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} required />
-                      <InputGroup.Text onClick={() => setShowPassword(!showPassword)} style={{ cursor: 'pointer' }}>
-                        {showPassword ? <FaEyeSlash /> : <FaEye />}
-                      </InputGroup.Text>
-                    </InputGroup>
-                  </Form.Group>
+                  <Form.Floating className="mb-3">
+                    <Form.Control id="username" type="text" placeholder="ユーザー名" value={username} onChange={(e) => setUsername(e.target.value)} required />
+                    <label htmlFor="username">ユーザー名</label>
+                  </Form.Floating>
+                  
+                  <Form.Floating className="mb-4">
+                    <Form.Control id="password" type={showPassword ? "text" : "password"} placeholder="パスワード" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                    <label htmlFor="password">パスワード</label>
+                    <InputGroup.Text onClick={() => setShowPassword(!showPassword)} style={{ cursor: 'pointer', position: 'absolute', right: 0, top: 0, height: '100%', zIndex: 3 }}>
+                      {showPassword ? <FaEyeSlash /> : <FaEye />}
+                    </InputGroup.Text>
+                  </Form.Floating>
+
                   <Button disabled={loading} className="w-100" type="submit">
                     {loading ? <Spinner as="span" animation="border" size="sm" /> : 'ログイン'}
                   </Button>
