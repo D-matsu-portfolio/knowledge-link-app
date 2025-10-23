@@ -3,7 +3,7 @@ import { FaChalkboardTeacher, FaUsers, FaHandshake } from 'react-icons/fa';
 
 export default function AuthBranding() {
   return (
-    <div className="h-100 p-5 text-white bg-primary d-flex flex-column justify-content-center">
+    <div className="p-5 text-white bg-primary d-flex flex-column justify-content-center w-100">
       <h1 className="display-4 mb-4">KnowledgeLink</h1>
       <p className="lead mb-4">知識で繋がる、新しい学びの形。</p>
       

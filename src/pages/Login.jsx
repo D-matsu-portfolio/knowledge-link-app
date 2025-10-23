@@ -35,14 +35,14 @@ export default function Login() {
   };
 
   return (
-    <Container fluid className="vh-100">
+    <Container fluid className="min-vh-100">
       <Row className="h-100">
-        <Col md={6} className="d-none d-md-flex p-0">
+        <Col lg={6} className="d-flex p-0">
           <AuthBranding />
         </Col>
-        <Col md={6} xs={12} className="d-flex align-items-center justify-content-center bg-light">
-          <div className="w-100" style={{ maxWidth: "400px" }}>
-            <Card className="shadow-lg">
+        <Col lg={6} xs={12} className="d-flex align-items-center justify-content-center bg-light">
+          <div className="w-100 p-4" style={{ maxWidth: "400px" }}>
+            <Card className="shadow-lg border-0">
               <Card.Body className="p-5">
                 <h2 className="text-center mb-4">ログイン</h2>
                 {error && <Alert variant="danger">{error}</Alert>}
