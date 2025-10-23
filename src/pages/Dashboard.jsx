@@ -3,6 +3,26 @@ import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../contexts/AuthContext';
 import { Container, Row, Col, Card, Spinner, Alert, Button, ListGroup } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import { FaUserPlus, FaAddressCard } from 'react-icons/fa';
+
+const WelcomeHeader = ({ profile, user }) => (
+  <div className="p-5 mb-4 bg-light rounded-3">
+    <Container fluid className="py-5">
+      <h1 className="display-5 fw-bold">おかえりなさい, {profile?.username || user?.email}さん！</h1>
+      <p className="col-md-8 fs-4">
+        学習の旅を始めましょう。新しいパートナーを探したり、プロフィールを充実させて他の人に見つけてもらいやすくしましょう。
+      </p>
+      <Link to="/users" className="btn btn-primary btn-lg me-2">
+        <FaUserPlus className="me-2" />
+        パートナーを探す
+      </Link>
+      <Link to="/profile" className="btn btn-secondary btn-lg">
+        <FaAddressCard className="me-2" />
+        プロフィールを編集
+      </Link>
+    </Container>
+  </div>
+);
 
 export default function Dashboard() {
   const { user, profile } = useAuth();
@@ -13,9 +33,9 @@ export default function Dashboard() {
 
   useEffect(() => {
     const fetchDashboardData = async () => {
+      if (!user) return;
       setLoading(true);
       try {
-        // 1. 自分宛の保留中リクエストを取得
         const { data: requestsData, error: requestsError } = await supabase
           .from('commitments')
           .select('id, requester_id, requester:profiles!requester_id(username)')
@@ -24,26 +44,18 @@ export default function Dashboard() {
         if (requestsError) throw requestsError;
         setPendingRequests(requestsData);
 
-        // 2. 契約中のパートナーを取得
         const { data: partnersData, error: partnersError } = await supabase
           .from('commitments')
-          .select(`
-            id,
-            requester_id,
-            addressee_id,
-            requester:profiles!requester_id(username),
-            addressee:profiles!addressee_id(username)
-          `)
+          .select(`id, requester_id, addressee_id, requester:profiles!requester_id(username), addressee:profiles!addressee_id(username)`)
           .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`)
           .eq('status', 'ACTIVE');
         if (partnersError) throw partnersError;
         
-        // 相手の情報を抽出
         const partners = partnersData.map(p => {
           const isRequester = p.requester_id === user.id;
           const partnerProfile = isRequester ? p.addressee : p.requester;
           const partnerId = isRequester ? p.addressee_id : p.requester_id;
-          return { id: partnerId, username: partnerProfile.username };
+          return { id: partnerId, username: partnerProfile.username, commitmentId: p.id };
         });
         setActivePartners(partners);
 
@@ -53,10 +65,7 @@ export default function Dashboard() {
         setLoading(false);
       }
     };
-
-    if (user) {
-      fetchDashboardData();
-    }
+    fetchDashboardData();
   }, [user]);
 
   if (loading) return <Container className="text-center mt-5"><Spinner animation="border" /></Container>;
@@ -64,38 +73,21 @@ export default function Dashboard() {
 
   return (
     <Container>
-      <h2 className="my-4">ダッシュボード</h2>
+      <WelcomeHeader profile={profile} user={user} />
+      
       <Row>
-        {/* Welcome Card */}
         <Col md={12} className="mb-4">
           <Card>
+            <Card.Header as="h5">あなたへの申請</Card.Header>
             <Card.Body>
-              <Card.Title>おかえりなさい, {profile?.username || user?.email}さん！</Card.Title>
-              <Card.Text>
-                KnowledgeLinkへようこそ！あなたの学習パートナーシップの状況は以下の通りです。
-              </Card.Text>
-            </Card.Body>
-          </Card>
-        </Col>
-
-        {/* Pending Requests & Active Partners */}
-        <Col md={6} className="mb-4">
-          <Card className="h-100">
-            <Card.Body>
-              <Card.Title>あなたへの申請</Card.Title>
               {pendingRequests.length > 0 ? (
-                <>
-                  <ListGroup variant="flush">
-                    {pendingRequests.slice(0, 3).map(req => (
-                      <ListGroup.Item key={req.id} className="d-flex justify-content-between align-items-center">
-                        <Link to={`/users/${req.requester_id}`}>{req.requester.username}</Link> さんからの申請
-                      </ListGroup.Item>
-                    ))}
-                  </ListGroup>
-                  <div className="text-center mt-3">
-                    <Button as={Link} to="/commitments" variant="primary">全ての申請を見る</Button>
-                  </div>
-                </>
+                <ListGroup variant="flush">
+                  {pendingRequests.map(req => (
+                    <ListGroup.Item key={req.id} action as={Link} to="/commitments">
+                      <strong>{req.requester.username}</strong> さんからパートナー申請が届いています。
+                    </ListGroup.Item>
+                  ))}
+                </ListGroup>
               ) : (
                 <p className="text-muted">新しい申請はありません。</p>
               )}
@@ -103,15 +95,15 @@ export default function Dashboard() {
           </Card>
         </Col>
 
-        <Col md={6} className="mb-4">
-          <Card className="h-100">
+        <Col md={12} className="mb-4">
+          <Card>
+            <Card.Header as="h5">契約中のパートナー</Card.Header>
             <Card.Body>
-              <Card.Title>契約中のパートナー</Card.Title>
               {activePartners.length > 0 ? (
                 <ListGroup variant="flush">
-                  {activePartners.map((partner, index) => (
-                    <ListGroup.Item key={`partner-${partner.id}-${index}`}>
-                      <Link to={`/users/${partner.id}`}>{partner.username}</Link>
+                  {activePartners.map(partner => (
+                    <ListGroup.Item key={partner.id} action as={Link} to={`/chat/${partner.commitmentId}`}>
+                       <strong>{partner.username}</strong> さんと契約中です。チャットを開始しましょう。
                     </ListGroup.Item>
                   ))}
                 </ListGroup>

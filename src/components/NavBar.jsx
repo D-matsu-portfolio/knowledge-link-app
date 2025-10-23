@@ -30,7 +30,7 @@ export default function NavBar() {
   };
 
   return (
-    <Navbar bg="light" expand="lg" className="mb-4 shadow-sm">
+    <Navbar bg="primary" variant="dark" expand="lg" className="shadow-sm">
       <Container>
         <Navbar.Brand as={Link} to="/">KnowledgeLink</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -49,7 +49,7 @@ export default function NavBar() {
                     clearNotifications();
                   }
                 }}>
-                  <Dropdown.Toggle variant="light" id="dropdown-notifications" className="me-3">
+                  <Dropdown.Toggle variant="primary" id="dropdown-notifications" className="me-3">
                     <FaBell />
                     {notifications.length > 0 && (
                       <Badge pill bg="danger" style={{ position: 'absolute', top: '-5px', right: '0px' }}>
@@ -74,7 +74,7 @@ export default function NavBar() {
                 <Navbar.Text className="me-3">
                   ログイン中: {profile?.username || user.email}
                 </Navbar.Text>
-                <Button variant="outline-danger" onClick={handleSignOut}>
+                <Button variant="outline-light" onClick={handleSignOut}>
                   ログアウト
                 </Button>
               </>
