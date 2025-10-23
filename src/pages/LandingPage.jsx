@@ -51,7 +51,6 @@ export default function LandingPage() {
               src="/hero-image.png" 
               alt="学び合う人々のイラスト" 
               className="img-fluid rounded shadow-sm mb-5"
-              style={{ maxWidth: '800px' }}
             />
           </motion.div>
           <motion.div variants={itemVariants}>

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Container, Form, Button, Card, Alert, InputGroup, Row, Col } from 'react-bootstrap';
+import { Container, Form, Button, Card, Alert, InputGroup, Row, Col, Spinner } from 'react-bootstrap';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { supabase } from '../lib/supabaseClient';
 import AuthBranding from '../components/AuthBranding';
