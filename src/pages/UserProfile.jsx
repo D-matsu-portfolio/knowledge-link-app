@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../contexts/AuthContext';
 import { Container, Row, Col, Card, Spinner, Alert, Badge, Button, Modal, Form } from 'react-bootstrap';
 import ReviewList from '../components/ReviewList';
+import AnimatedPage from '../components/AnimatedPage';
 
 export default function UserProfile() {
   const { id } = useParams();
@@ -41,7 +42,27 @@ export default function UserProfile() {
 
   const handleCommitmentRequest = async (e) => {
     e.preventDefault();
-    // ... (implementation is correct)
+    setIsSubmitting(true);
+    setError('');
+    setSuccess('');
+    try {
+      const { error: insertError } = await supabase
+        .from('commitments')
+        .insert({
+          requester_id: currentUser.id,
+          addressee_id: profile.id,
+          goal: goal,
+          status: 'PENDING'
+        });
+      if (insertError) throw insertError;
+      setSuccess('パートナー契約を申請しました！');
+      setShowModal(false);
+      setGoal('');
+    } catch (error) {
+      setError('申請に失敗しました: ' + error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (loading) return <Container className="text-center mt-5"><Spinner animation="border" /></Container>;
@@ -52,7 +73,7 @@ export default function UserProfile() {
   const cameFromCommitments = location.state?.from === 'commitments';
 
   return (
-    <>
+    <AnimatedPage>
       <Container className="my-4">
         {success && <Alert variant="success" onClose={() => setSuccess('')} dismissible>{success}</Alert>}
         {error && <Alert variant="danger" onClose={() => setError('')} dismissible>{error}</Alert>}
@@ -101,8 +122,32 @@ export default function UserProfile() {
       </Container>
 
       <Modal show={showModal} onHide={() => setShowModal(false)} centered>
-        {/* ... (Modal content) ... */}
+        <Modal.Header closeButton>
+          <Modal.Title>パートナー契約の申請</Modal.Title>
+        </Modal.Header>
+        <Form onSubmit={handleCommitmentRequest}>
+          <Modal.Body>
+            <p><strong>{profile?.username || '相手'}</strong>さんにパートナー契約を申請します。</p>
+            <Form.Group>
+              <Form.Label>学習の目標や、相手に何を教えてほしいかを具体的に書きましょう。</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={4}
+                value={goal}
+                onChange={(e) => setGoal(e.target.value)}
+                placeholder="例: Reactの基本的な使い方を学び、簡単なTodoアプリを作れるようになりたいです。"
+                required
+              />
+            </Form.Group>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowModal(false)}>キャンセル</Button>
+            <Button variant="primary" type="submit" disabled={isSubmitting}>
+              {isSubmitting ? <Spinner as="span" animation="border" size="sm" /> : '申請する'}
+            </Button>
+          </Modal.Footer>
+        </Form>
       </Modal>
-    </>
+    </AnimatedPage>
   );
 }
