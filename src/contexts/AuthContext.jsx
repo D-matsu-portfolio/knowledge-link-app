@@ -5,24 +5,64 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // 最初にセッション情報を取得
-    const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setUser(session?.user ?? null);
+    const setupUserSession = async () => {
+      // 1. 現在のセッションを取得
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) {
+        console.error('Error getting session:', sessionError);
+        setLoading(false);
+        return;
+      }
+
+      const sessionUser = session?.user;
+      setUser(sessionUser ?? null);
+
+      // 2. ログインしている場合はプロフィールを取得
+      if (sessionUser) {
+        const { data: userProfile, error: profileError } = await supabase
+          .from('profiles')
+          .select('username')
+          .eq('id', sessionUser.id)
+          .single();
+        
+        if (profileError) {
+          console.error('Error fetching profile:', profileError);
+        }
+        setProfile(userProfile ?? null);
+      } else {
+        setProfile(null);
+      }
+      
+      // 3. どのような場合でもローディングを終了
       setLoading(false);
     };
 
-    getSession();
+    setupUserSession();
 
     // 認証状態の変更を監視
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+      const sessionUser = session?.user;
+      setUser(sessionUser ?? null);
+
+      if (sessionUser) {
+        supabase
+          .from('profiles')
+          .select('username')
+          .eq('id', sessionUser.id)
+          .single()
+          .then(({ data, error }) => {
+            if (error) console.error('Error fetching profile on auth change:', error);
+            setProfile(data ?? null);
+          });
+      } else {
+        setProfile(null);
+      }
     });
 
-    // クリーンアップ関数
     return () => {
       subscription?.unsubscribe();
     };
@@ -34,6 +74,7 @@ export const AuthProvider = ({ children }) => {
     signOut: () => supabase.auth.signOut(),
     updatePassword: (data) => supabase.auth.updateUser(data),
     user,
+    profile,
   };
 
   return (
